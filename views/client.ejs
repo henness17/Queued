@@ -1,0 +1,95 @@
+<head>
+    <link rel="stylesheet" type="text/css" href="grid.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+        crossorigin="anonymous">
+</head>
+<script src="player-bundle.js"></script>
+
+<body>
+    <div class="container">
+        <div class="owner" style="display: flex;justify-content: center;align-items: center;">
+            Ryan's Station
+        </div>
+
+        <div class="queue-container">
+            <% for(var i = 0; i < 4; i++) { %>
+                <div class="queue-song">
+                    <div>
+                        <img src="" id="queue-cover<%= i %>" style='height: 100%; width: 100%; object-fit: contain'>
+                    </div>
+                    <div>
+                        <p id="queue-title<%= i %>"></p>
+                        <p id="queue-artist<%= i %>"></p>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+
+        <div class="cover">
+            <img src="" id="cover" style='height: 100%; width: 100%; object-fit: contain'>
+        </div>
+
+        <div class="title">
+            <center>
+                <marquee behavior="scroll" direction="left" scrollamount="1">
+                    <p id="title"></p>
+                    <p id="artist"></p>
+                </marquee>
+                <input type="text" name="song" id="enqueue-song" value="">
+                <button onClick="enqueueSong(document.getElementById('enqueue-song').value);emitEnqueue(document.getElementById('enqueue-song').value)">Enqueue</button>
+            </center>
+        </div>
+
+        <div class="controls">
+            <div style="display: flex;justify-content: center;align-items: center;">
+                <input type="range" min="1" max="100" value="0" class="slider" id="timeline">
+            </div>
+            <div style="display: flex;justify-content: center;align-items: center;">
+                <button class="btn btn-success" onclick="playSong();updateQueue();emitPlay()" id="btn-play">Play</button>
+                <button class="btn btn-danger" onclick="pauseSong();emitPause()" id="btn-pause">Pause</button>
+                <button type="button" class="btn btn-warning" onclick="skipSong();emitSkip()" id="btn-skip">Skip</button>
+                <div class="volume">
+                    <center>
+                        <input type="range" min="0" max="100" value="80" class="slider" id="volume-range">
+                    </center>
+                </div>
+            </div>
+        </div>
+
+        <div class="listeners">
+            <div class="listeners-content" style="display: flex;justify-content: center;align-items: center;">
+                <img src="https://developers.soundcloud.com/assets/powered_by_black-4339b4c3c9cf88da9bfb15a16c4f6914.png" style="padding-top:100fr">
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+        socket.on('skip song', function () {
+            skipSong();
+        });
+        socket.on('pause song', function () {
+            pauseSong();
+        });
+        socket.on('play song', function () {
+            playSong();
+        });
+        socket.on('enqueue song', function (data) {
+            enqueueSong(data.url);
+        });
+        socket.on('dequeue song', function () {
+            dequeueSong();
+        });
+    </script>
+</body>
+<script>
+    var volume = document.getElementById("volume-range");
+    volume.oninput = function () {
+        setVolume(this.value);
+    }
+    var time = document.getElementById("timeline");
+    timeline.oninput = function () {
+        setTime(this.value);
+    }
+</script>
